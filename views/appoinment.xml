@@ -4,14 +4,19 @@
         <field name="name">hospital.appointment.view.tree</field>
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
-            <tree   decoration-success="state == 'done'"
-                    decoration-info="state == 'draft'"
-                    decoration-danger="state == 'cancel'"
-                    decoration-warning="state == 'in_consultation'"
+            <tree sample="1" multi_edit="true"
+                  decoration-success="state == 'done'"
+                  decoration-info="state == 'draft'"
+                  decoration-danger="state == 'cancel'"
+                  decoration-warning="state == 'in_consultation'"
             >
                 <field name="patient_id"/>
+                <field name="ref" optional="show"/>
+                <field name="doctor_id" widget="many2one_avatar_user"/>
+                <field name="gender" optional="hide"/>
                 <field name="appointment_time"/>
-                <field name="booking_date"/>
+                <field name="booking_date" optional="show"/>
+                <field name="activity_ids" widget="list_activity"/>
                 <field name="state"
                        decoration-success="state == 'done'"
                        decoration-info="state == 'draft'"
@@ -27,7 +32,16 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <field name="state" widget="statusbar" nolabel="1" options="{'clickable': '1'}"
+                    <button name="action_in_consultation" string="In Consultation" type="object"
+                            states="draft" class="oe_highlight" data-hotkey="i"/>
+                    <button name="action_done" string="Mask As Done" type="object"
+                            states="in_consultation" class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            states="in_consultation,draft" data-hotkey="z"/>
+                    <button name="action_draft" string="Draft" type="object"
+                            states="done" data-hotkey="d"/>
+                    <!--options="{'clickable': '1'}"-->
+                    <field name="state" widget="statusbar" nolabel="1"
                            statusbar_visible="draft,in_consultation,done"/>
                 </header>
                 <sheet>
@@ -40,7 +54,8 @@
                         <group>
                             <field name="patient_id"/>
                             <field name="gender"/>
-                            <field name="booking_date" help="Date of booking"/>
+                            <field name="booking_date" help="Date of booking" defualt_focus="1"/>
+                            <field name="doctor_id" widget="many2one_avatar"/>
                         </group>
                         <group>
                             <field name="ref"/>
@@ -57,7 +72,8 @@
                     </group>
                     <notebook>
                         <page string="Prescription" name="prescription">
-                            <field name="prescription" placeholder="Enter your prescription"/>
+                            <field name="prescription" placeholder="Enter your prescription"
+                                   options="{'collaborative':true, 'resizable':true}"/>
                         </page>
                         <page string="Pharmacy" name="pharmacy">
                             <group>

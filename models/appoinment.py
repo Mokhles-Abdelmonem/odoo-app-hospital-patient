@@ -24,6 +24,7 @@ class Hospital_appointment(models.Model):
         ('done', 'Done'),
         ('cancel', 'Cancelled')], default='draft', string='Status', require=True)
 
+    doctor_id = fields.Many2one('res.users', string="Doctor", tracking=True)
     @api.onchange('patient_id')
     def onchange_patient_id(self):
         self.ref = self.patient_id.ref
@@ -37,3 +38,18 @@ class Hospital_appointment(models.Model):
                 'type': 'rainbow_man',
             }
         }
+    def action_in_consultation(self):
+        for rec in self:
+            rec.state = 'in_consultation'
+
+    def action_done(self):
+        for rec in self:
+            rec.state = 'done'
+
+    def action_cancel(self):
+        for rec in self:
+            rec.state = 'cancel'
+
+    def action_draft(self):
+        for rec in self:
+            rec.state = 'draft'
